@@ -9,14 +9,22 @@ logger = logging.getLogger(__name__)
 def handle_project_save(sender, instance, created, **kwargs):
     project_name = instance.name_of_project
     created_by = getattr(instance.created_by, 'username', 'Unknown')
+    assigned_to = getattr(instance.user, 'username', 'Unassigned')
 
     if created:
-        logger.info(f"New project created: {project_name} by {created_by}")
+        logger.info(
+            f"🆕 New project created: '{project_name}' by {created_by}, assigned to {assigned_to}"
+        )
     else:
-        logger.info(f"Project updated: {project_name}")
+        logger.info(
+            f"✏️ Project updated: '{project_name}' (Created by: {created_by}, Assigned to: {assigned_to})"
+        )
 
 @receiver(post_delete, sender=Project)
 def handle_project_delete(sender, instance, **kwargs):
     project_name = instance.name_of_project
-    logger.info(f"Project deleted: {project_name}")
+    created_by = getattr(instance.created_by, 'username', 'Unknown')
+    logger.info(f"🗑️ Project deleted: '{project_name}' (Created by: {created_by})")
+
+
 

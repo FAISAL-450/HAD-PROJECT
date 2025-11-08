@@ -19,7 +19,7 @@ def filter_projects(query=None, user=None, admin_view=False):
     queryset = Project.objects.all()
 
     if not admin_view and user:
-        queryset = queryset.filter(user=user)
+        queryset = queryset.filter(user=user)  # Assigned user
 
     if query:
         queryset = queryset.filter(
@@ -41,7 +41,7 @@ def get_paginated_queryset(request, queryset, per_page=10):
         return paginator.page(1)
     except EmptyPage:
         return paginator.page(paginator.num_pages)
-        
+
 # E - Team Dashboard View (Team Member)
 @login_required
 def project_dashboard(request):
@@ -54,8 +54,8 @@ def project_dashboard(request):
 
     if request.method == "POST" and form.is_valid() and not is_admin:
         project = form.save(commit=False)
-        project.user = request.user
-        project.created_by = request.user
+        project.user = request.user  # Assigned user
+        project.created_by = request.user  # Creator
         project.save()
         messages.success(request, "✅ Project created successfully.")
         return redirect(f"{reverse('project_dashboard')}?q={query}")
@@ -134,3 +134,5 @@ def delete_project(request, pk):
         "project": project,
         "query": query
     })
+
+
