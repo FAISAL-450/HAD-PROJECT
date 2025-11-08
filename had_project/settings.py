@@ -59,7 +59,7 @@ INSTALLED_APPS = [
     'home',
     'construction',
     'finance',
-    'project',
+    'project.apps.ProjectConfig',
     'account',
     'accounts',
 ]
