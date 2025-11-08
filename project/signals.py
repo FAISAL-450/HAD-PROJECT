@@ -13,7 +13,7 @@ def handle_project_save(sender, instance, created, **kwargs):
 
     if created:
         logger.info(
-            f"🆕 New project created: '{project_name}' by {created_by}, assigned to {assigned_to}"
+            f"🆕 Project created: '{project_name}' by {created_by}, assigned to {assigned_to}"
         )
     else:
         logger.info(
@@ -24,7 +24,10 @@ def handle_project_save(sender, instance, created, **kwargs):
 def handle_project_delete(sender, instance, **kwargs):
     project_name = instance.name_of_project
     created_by = getattr(instance.created_by, 'username', 'Unknown')
-    logger.info(f"🗑️ Project deleted: '{project_name}' (Created by: {created_by})")
+    logger.info(
+        f"🗑️ Project deleted: '{project_name}' (Created by: {created_by})"
+    )
+
 
 
 
