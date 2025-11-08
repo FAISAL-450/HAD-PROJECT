@@ -1,0 +1,59 @@
+name: 🚀 Deploy Django App to Azure
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      DJANGO_SETTINGS_MODULE: had_project.settings
+
+    steps:
+      # 📥 Step 1: Checkout code
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v3
+
+      # 🐍 Step 2: Set up Python
+      - name: 🐍 Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      # 📦 Step 3: Install dependencies
+      - name: 📦 Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 🔐 Step 4: Export Django secrets (no PostgreSQL)
+      - name: 🔐 Export Django secrets
+        run: |
+          echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> $GITHUB_ENV
+          echo "DJANGO_ALLOWED_HOSTS=${{ secrets.DJANGO_ALLOWED_HOSTS }}" >> $GITHUB_ENV
+          echo "DJANGO_DEBUG=${{ secrets.DJANGO_DEBUG }}" >> $GITHUB_ENV
+          echo "CSRF_TRUSTED_ORIGINS=${{ secrets.CSRF_TRUSTED_ORIGINS }}" >> $GITHUB_ENV
+
+      # 🧪 Step 5: Verify settings path
+      - name: 🧪 Verify settings.py exists
+        run: cat had_project/settings.py
+
+      # 📁 Step 6: Collect static files
+      - name: 📁 Collect static files
+        run: python manage.py collectstatic --noinput
+
+      # 🗃️ Step 7: Apply migrations (optional if using SQLite)
+      - name: 🗃️ Apply database migrations
+        run: python manage.py migrate
+
+      # 🚀 Step 8: Deploy to Azure Web App
+      - name: 🚀 Deploy to Azure
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: had-ac-app
+          slot-name: production
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISH_PROFILE }}
+          package: .
+
