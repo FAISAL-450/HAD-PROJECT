@@ -7,11 +7,16 @@ logger = logging.getLogger(__name__)
 
 @receiver(post_save, sender=Project)
 def handle_project_save(sender, instance, created, **kwargs):
+    project_name = instance.name_of_project
+    created_by = getattr(instance.created_by, 'username', 'Unknown')
+
     if created:
-        logger.info(f"New project created: {instance.name_of_project} by {instance.created_by.username}")
+        logger.info(f"New project created: {project_name} by {created_by}")
     else:
-        logger.info(f"Project updated: {instance.name_of_project}")
+        logger.info(f"Project updated: {project_name}")
 
 @receiver(post_delete, sender=Project)
 def handle_project_delete(sender, instance, **kwargs):
-    logger.info(f"Project deleted: {instance.name_of_project}")
+    project_name = instance.name_of_project
+    logger.info(f"Project deleted: {project_name}")
+
